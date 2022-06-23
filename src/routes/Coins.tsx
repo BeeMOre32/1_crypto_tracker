@@ -1,8 +1,9 @@
 import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useQuery } from "react-query";
+import { fethCoins } from "./fetch";
+import { Helmet } from "react-helmet";
 
 const Container = styled.div`
   padding: 0px 15px;
@@ -56,7 +57,7 @@ const Title = styled.h1`
   font-size: 2em;
 `;
 
-interface CoinInterface {
+interface ICoin {
   id: string;
   name: string;
   symbol: string;
@@ -67,31 +68,21 @@ interface CoinInterface {
 }
 
 function Coin() {
-  const [coins, setCoins] = useState<CoinInterface[]>([]);
-  const [loading, setLoaing] = useState(true);
-  useEffect(() => {
-    axios
-      .get("https://api.coinpaprika.com/v1/coins")
-      .then((data) => {
-        setCoins(data.data.slice(0, 100));
-        setLoaing(false);
-      })
-      .catch(() => {
-        alert(
-          `opps! There is error. you might have check your internet connection`
-        );
-      });
-  }, []);
+  const { isLoading, data } = useQuery<ICoin[]>("allCoin", fethCoins);
+
   return (
     <Container>
+      <Helmet>
+        <title>Coins</title>
+      </Helmet>
       <Header>
         <Title>Coins</Title>
       </Header>
-      {loading ? (
+      {isLoading ? (
         <Loader>Loading...</Loader>
       ) : (
         <CoinsList>
-          {coins.map((coin) => (
+          {data?.slice(0, 100).map((coin) => (
             <Coins
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

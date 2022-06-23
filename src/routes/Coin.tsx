@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
+import { useQuery } from "react-query";
+
 import {
   Link,
   Outlet,
@@ -12,6 +15,7 @@ import {
 import styled from "styled-components";
 import { InfoData } from "../interface/Coininfo";
 import { PriceInfo } from "../interface/PriceInfo";
+import { fetchInfo, fetchPrice } from "./fetch";
 
 interface ILocation {
   state: {
@@ -32,6 +36,16 @@ const Header = styled.header`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  a {
+    position: absolute;
+    left: 0;
+    width: 80px;
+    height: 50px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: black;
+  }
 `;
 const Loader = styled.span`
   display: block;
@@ -101,35 +115,39 @@ const Tab = styled.div<{ isActive: boolean }>`
   color: ${(props) => props.theme.textColor};
   height: 30px;
   a {
+    display: block;
   }
 `;
 
 function Coins() {
-  const [loading, setLoaing] = useState(true);
   const { coinId } = useParams();
   const { state } = useLocation() as ILocation;
-  const [info, setInfo] = useState<InfoData>();
-  const [priceInfo, setPriceInfo] = useState<PriceInfo>();
   const PriceMatch = useMatch("/:coinId/Price");
   const ChartsMatch = useMatch("/:coinId/Charts");
-  useEffect(() => {
-    (async () => {
-      const infoData = await (
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      ).json();
-      const priceData = await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-      ).json();
-      setInfo(infoData);
-      setPriceInfo(priceData);
-      setLoaing(false);
-    })();
-  }, [coinId]);
+  const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
+    ["info", coinId],
+    () => fetchInfo(coinId)
+  );
+  const { isLoading: tickersLoading, data: tickersData } = useQuery<PriceInfo>(
+    ["tickers", coinId],
+    () => fetchPrice(coinId),
+    {
+      refetchInterval: 5000,
+    }
+  );
+  const loading = infoLoading && tickersLoading;
+
   return (
     <Container>
+      <Helmet>
+        <title>
+          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
+        </title>
+      </Helmet>
       <Header>
+        <Link to="/">Back to Home</Link>
         <Title>
-          {state?.name ? state.name : loading ? "Loading..." : info?.name}
+          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
         </Title>
       </Header>
       {loading ? (
@@ -144,20 +162,22 @@ function Coins() {
               <CoinSpanbig>Symbol</CoinSpanbig>
             </CoinContext>
             <CoinContext>
-              <CoinSpanbig>Opensource</CoinSpanbig>
+              <CoinSpanbig>Price</CoinSpanbig>
             </CoinContext>
             <CoinContext>
-              <CoinSpanSm>{info?.rank}</CoinSpanSm>
+              <CoinSpanSm>{infoData?.rank}</CoinSpanSm>
             </CoinContext>
             <CoinContext>
-              <CoinSpanSm>{info?.symbol}</CoinSpanSm>
+              <CoinSpanSm>{infoData?.symbol}</CoinSpanSm>
             </CoinContext>
             <CoinContext>
-              <CoinSpanSm>{info?.open_source?.toString()}</CoinSpanSm>
+              <CoinSpanSm>
+                ${tickersData?.quotes.USD.price.toFixed(3)}
+              </CoinSpanSm>
             </CoinContext>
           </Warpper>
           <DesCointainer>
-            <Description>{info?.description}</Description>
+            <Description>{infoData?.description}</Description>
           </DesCointainer>
           <PriceWrapper>
             <CoinContext>
@@ -167,10 +187,10 @@ function Coins() {
               <CoinSpanbig>Max Supply</CoinSpanbig>
             </CoinContext>
             <CoinContext>
-              <CoinSpanSm>{priceInfo?.total_supply}</CoinSpanSm>
+              <CoinSpanSm>{tickersData?.total_supply}</CoinSpanSm>
             </CoinContext>
             <CoinContext>
-              <CoinSpanSm>{priceInfo?.max_supply}</CoinSpanSm>
+              <CoinSpanSm>{tickersData?.max_supply}</CoinSpanSm>
             </CoinContext>
           </PriceWrapper>
           <Tabs>
