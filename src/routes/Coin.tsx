@@ -44,7 +44,7 @@ const Header = styled.header`
     height: 50px;
     padding: 10px;
     border-radius: 8px;
-    background-color: black;
+    background-color: ${(props) => props.theme.bgColor};
   }
 `;
 const Loader = styled.span`
@@ -59,13 +59,13 @@ const Warpper = styled.div`
   padding: 10px;
   width: 100%;
   border-radius: 8px;
-  background-color: rgb(0, 0, 0);
+  background-color: ${(props) => props.theme.bgColor};
   gap: 5px;
 `;
 
 const CoinContext = styled.div`
   padding: 10px;
-  background-color: rgb(0, 0, 0);
+  background-color: ${(props) => props.theme.bgColor};
   width: 100%;
   display: flex;
   align-items: center;
@@ -111,7 +111,7 @@ const Tab = styled.div<{ isActive: boolean }>`
   justify-content: center;
   border-radius: 10px;
   background-color: ${(props) =>
-    props.isActive ? props.theme.accentColor : `black`};
+    props.isActive ? props.theme.accentColor : props.theme.bgColor};
   color: ${(props) => props.theme.textColor};
   height: 30px;
   a {

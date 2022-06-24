@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { useQuery } from "react-query";
 import { fethCoins } from "./fetch";
 import { Helmet } from "react-helmet";
+import { useSetRecoilState } from "recoil";
+import { isDarkAtom } from "../atoms/atoms";
 
 const Container = styled.div`
   padding: 0px 15px;
@@ -23,8 +25,8 @@ const CoinsList = styled.ul`
 `;
 
 const Coins = styled(motion.div)`
-  background-color: white;
-  color: ${(prps) => prps.theme.bgColor};
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(prps) => prps.theme.textColor};
   margin-bottom: 10px;
   border-radius: 13px;
   padding: 17px;
@@ -32,6 +34,7 @@ const Coins = styled(motion.div)`
   a {
     display: flex;
     align-items: center;
+    color: ${(props) => props.theme.textColor};
   }
   &:hover {
     a {
@@ -69,7 +72,10 @@ interface ICoin {
 
 function Coin() {
   const { isLoading, data } = useQuery<ICoin[]>("allCoin", fethCoins);
-
+  const setDarkAtom = useSetRecoilState(isDarkAtom);
+  const toggleSetDarkAtom = () => {
+    setDarkAtom((prev) => !prev);
+  };
   return (
     <Container>
       <Helmet>
@@ -77,6 +83,7 @@ function Coin() {
       </Helmet>
       <Header>
         <Title>Coins</Title>
+        <button onClick={toggleSetDarkAtom}>Toggle Mode</button>
       </Header>
       {isLoading ? (
         <Loader>Loading...</Loader>

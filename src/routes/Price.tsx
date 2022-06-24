@@ -13,14 +13,14 @@ const Context = styled.div`
   height: 40px;
   border-radius: 10px;
   margin-top: 30px;
-  background-color: ${(props) => props.theme.textColor};
+  background-color: white;
   padding: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   span {
-    background-color: ${(props) => props.theme.textColor};
-    color: ${(props) => props.theme.bgColor};
+    background-color: white;
+    color: ${(props) => props.theme.textColor};
   }
 `;
 

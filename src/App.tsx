@@ -1,6 +1,10 @@
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle, ThemeProvider } from "styled-components";
 import Router from "./router";
 import { ReactQueryDevtools } from "react-query/devtools";
+import { Darktheme, Lighttheme } from "./theme";
+import { useState } from "react";
+import { useRecoilValue } from "recoil";
+import { isDarkAtom } from "./atoms/atoms";
 
 const GolbalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap');
@@ -23,7 +27,7 @@ time, mark, audio, video {
   font-size: 100%;
   font: inherit;
   vertical-align: baseline;
-  background-color: ${(props) => props.theme.bgColor};
+  background-color: ${(props) => props.theme.bodyColor};
   color: ${(props) => props.theme.textColor} ;
   font-family: 'Source Sans Pro', sans-serif;
 }
@@ -66,11 +70,14 @@ a {
 `;
 
 function App() {
+  const isDark = useRecoilValue(isDarkAtom);
   return (
     <>
-      <GolbalStyle />
-      <Router />
-      <ReactQueryDevtools />
+      <ThemeProvider theme={isDark ? Darktheme : Lighttheme}>
+        <GolbalStyle />
+        <Router />
+        <ReactQueryDevtools />
+      </ThemeProvider>
     </>
   );
 }

@@ -2,22 +2,20 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { BrowserRouter as Router } from "react-router-dom";
-import { ThemeProvider } from "styled-components";
 import App from "./App";
-import { theme } from "./theme";
+import { RecoilRoot } from "recoil";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 const queryClient = new QueryClient();
+
 root.render(
-  <React.StrictMode>
-    <Router basename={process.env.PUBLIC_URL}>
+  <Router basename={process.env.PUBLIC_URL}>
+    <RecoilRoot>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={theme}>
-          <App />
-        </ThemeProvider>{" "}
+        <App />
       </QueryClientProvider>
-    </Router>
-  </React.StrictMode>
+    </RecoilRoot>
+  </Router>
 );
